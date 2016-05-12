@@ -1,0 +1,11 @@
+<html>
+<body>
+	<h1>
+		<span style="color: red;">test</span>
+	</h1>
+	<form action="/login" method="post">
+		<input name="UserName"><br /> <input name="Pwd"
+			type="password"> <input type="submit" value="登录">
+	</form>
+</body>
+</html>

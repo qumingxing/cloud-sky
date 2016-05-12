@@ -1,0 +1,34 @@
+<html>
+<body>
+	<form action="/addStudent" method="post">
+		<table border="1">
+			<tr>
+				<td>编号</td>
+				<td><input name="Id"></td>
+				<td>姓名</td>
+				<td><input name="Name"></td>
+			</tr>
+			<tr>
+				<td>年龄</td>
+				<td><input name="Age"></td>
+				<td>性别</td>
+				<td><input type="radio" name="Sex" checked="checked" value="f">男
+					<input type="radio" name="Sex" value="m">女</td>
+			</tr>
+			<tr>
+				<td>电话</td>
+				<td><input name="Telephone"></td>
+				<td>班级</td>
+				<td><input name="Class"></td>
+			</tr>
+			<tr>
+				<td>地址</td>
+				<td colspan="3"><input name="Address"></td>
+			</tr>
+			<tr>
+				<td colspan="4"><input type="submit" value="提交"></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

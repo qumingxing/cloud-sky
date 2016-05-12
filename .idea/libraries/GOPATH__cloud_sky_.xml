@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;cloud-sky&gt;">
+    <CLASSES>
+      <root url="file://E:/vedio/src/run" />
+      <root url="file://E:/vedio/src/github.com" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
