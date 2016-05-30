@@ -16,7 +16,7 @@ func (p *RequestForm) GetRequestParameters(httpRequest *HttpRequest, obj interfa
 	t := fieldElem.Type() //type of UserInfo
 	for i := 0; i < fieldElem.NumField(); i++ {
 		field := fieldElem.Field(i)
-		requestVal := request.FormValue(t.Field(i).Name)
+		requestVal := request.FormValue(t.Field(i).Tag.Get("bson"))//t.Field(i).Name 修改使用`tag`
 		//fmt.Println(t.Field(i).Name, field.Kind(), requestVal)
 		switch field.Kind() {
 		case reflect.String:

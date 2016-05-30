@@ -97,9 +97,9 @@ func write(levelStr string, v ...interface{}) {
 			fmt.Println(time.Now().Format("15:04:05"), levelStr, filepath.Base(file)+":"+strconv.Itoa(line), "-", fmt.Sprint(v...))
 		}
 		if common.Equals(levelStr,"Error"){
-			buf := make([]byte, 1 << 20)
+			buf := make([]byte, 1 << 10)
 			runtime.Stack(buf, false)
-			fmt.Printf("呵呵\n%s", buf)
+			fmt.Printf("\n%s", buf)
 		}
 	}
 }

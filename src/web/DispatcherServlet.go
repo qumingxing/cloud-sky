@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"logs"
 	"net/http"
+	"strings"
 )
 
 type DispatcherServlet struct {
@@ -50,6 +51,10 @@ func (servlet *DispatcherServlet) ServeHTTP(response http.ResponseWriter, reques
 	uri := request.RequestURI
 	httpResponse := &HttpResponse{response}
 	httpRequest := &HttpRequest{httpRequest: request, httpResponse: httpResponse}
+	ind := strings.Index(uri, "?")
+	if ind != -1 {
+		uri = uri[0:ind]
+	}
 	logs.Debug(uri)
 	if !servlet.processInterceptor(httpRequest, httpResponse) {
 		return

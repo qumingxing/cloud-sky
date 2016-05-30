@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"logs"
 )
 
 type HttpRequest struct {
@@ -30,6 +31,14 @@ func (httpRequest *HttpRequest) GetSession() (newSession *Session) {
 		}
 	}
 	return
+}
+func (httpRequest *HttpRequest) GetCookieByName(name string) string {
+	cookie, err := httpRequest.httpRequest.Cookie(name)
+	if err == nil {
+		return cookie.Value
+	}
+	logs.Error(name, "获取cookie失败", err)
+	return ""
 }
 func (httpRequest *HttpRequest) GetRequest() *http.Request {
 	return httpRequest.httpRequest

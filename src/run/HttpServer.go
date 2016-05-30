@@ -14,7 +14,7 @@ func main() {
 	var register web.RegisterServlet
 	var simpleInterceptor action.SimpleInterceptor
 	if v, ok := basicServlet.(*web.DispatcherServlet); ok {
-		v.AddIntercepter("/*.html", simpleInterceptor)
+		v.AddIntercepter("/", simpleInterceptor) // /*.html
 	}
 	configMap := action.GetConfig()
 	for key, value := range configMap {
@@ -23,5 +23,5 @@ func main() {
 	}
 	http.Handle("/", basicServlet)
 	fmt.Println("server started")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8989", nil)
 }

@@ -18,3 +18,8 @@ func (response *HttpResponse) WriteHeader(headers map[string]string) {
 	}
 
 }
+func (response *HttpResponse) SetCookie(name string, value string) {
+	var cookie Cookie
+	var newCookie *Cookie = &Cookie{Name:name, Value: value}
+	cookie.AddCookie(newCookie, response)
+}

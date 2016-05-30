@@ -5,6 +5,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"common"
+	//"fmt"
+	"logs"
+	"errors"
 )
 
 const URL string = "127.0.0.1:27017"
@@ -38,6 +41,39 @@ func (baseDao *MongodbBaeDao)Add(c string, docs interface{}) (bool, error) {
 	}
 	return true, nil
 }
+func (baseDao *MongodbBaeDao)FindGroup(c string, groupKeys bson.D, cond bson.D,functionStr string, initial bson.D) []interface{} {
+	/*groupResult:=make(map[string]interface{},10)
+	getSession().DB("shopping").Run(bson.D{{"group",bson.D{{"ns",c},{"key","userToken"},
+		{"$reduce","function(cur,result){result.total+=cur.qty;}"},{"initial",bson.D{{"total",0}}}}}},groupResult)
+	fmt.Println(groupResult)
+	if aaa,ok:=groupResult["retval"].([]map[string]interface{});ok{
+		fmt.Println(aaa)
+	}
+	if bbb,ok:=groupResult["retval"].([]interface{});ok{
+		if ccc,ok1:=bbb[0].(map[string]interface{});ok1{
+			fmt.Println(ccc["total"],"--")
+		}
+
+	}*/
+	groupResult := make(map[string]interface{}, 10)
+	getSession().DB("shopping").Run(bson.D{{"group", bson.D{{"ns", c}, {"key", groupKeys},
+		{"$reduce", functionStr},{"cond",cond}, {"initial", initial}}}}, groupResult)
+	/*fmt.Println(groupResult)
+	if aaa,ok:=groupResult["retval"].([]map[string]interface{});ok{
+		fmt.Println(aaa)
+	}
+	if bbb,ok:=groupResult["retval"].([]interface{});ok{
+		if ccc,ok1:=bbb[0].(map[string]interface{});ok1{
+			fmt.Println(ccc["total"],"--")
+		}
+
+	}*/
+	if result, ok := groupResult["retval"].([]interface{}); ok {
+		return result
+	}
+	return nil
+
+}
 //bo,err:=baseDao.UpdateBySelector("mytest",bson.M{"tname":"guoguo1"},bson.M{"$set":bson.M{"age":2}})
 func (baseDao *MongodbBaeDao)UpdateBySelector(c string, selector interface{}, obj interface{}) (bool, error) {
 	err := GetCollection(c).Update(selector, obj)
@@ -64,8 +100,13 @@ func (baseDao *MongodbBaeDao)Delete(c string, id string) (bool, error) {
 //baseDao.GET("mytest","5745350a943c8c1f80f2dfac",stu)
 //fmt.Println(stu.Age,stu.Id.Hex())
 func (baseDao *MongodbBaeDao)GET(c string, id string, result interface{}) {
-	objid := bson.ObjectIdHex(id)
-	GetCollection(c).FindId(objid).One(result)
+	if ok := bson.IsObjectIdHex(id); ok {
+		objid := bson.ObjectIdHex(id)
+		logs.Debug(objid)
+		GetCollection(c).FindId(objid).One(result)
+	} else {
+		errors.New("无效的Mongodb ")
+	}
 }
 //stus:=make([]Student,10)
 //baseDao.FindAll("mytest",&stus)
@@ -98,6 +139,7 @@ fmt.Println(b.Id)
 //
 func (baseDao *MongodbBaeDao)FindQueryForPage(c string, query interface{}, result interface{}, pageinfo *common.PageInfo, orderby ...string) *common.PageData {
 	count := baseDao.FindQueryForCount(c, query)
+	logs.Debug("分页数量->", count)
 	if count > 0 {
 		pageinfo.SumCount = count
 		if count % pageinfo.PageSize == 0 {
@@ -106,14 +148,14 @@ func (baseDao *MongodbBaeDao)FindQueryForPage(c string, query interface{}, resul
 			pageinfo.SumPage = count / pageinfo.PageSize + 1
 		}
 		queryObject := GetCollection(c).Find(query)
-		if queryObject != nil {
+		if len(orderby) > 0 {
 			queryObject.Sort(orderby...).Skip((pageinfo.PageIndex - 1) * pageinfo.PageSize).Limit(pageinfo.PageSize).All(result)
 		} else {
 			queryObject.Skip((pageinfo.PageIndex - 1) * pageinfo.PageSize).Limit(pageinfo.PageSize).All(result)
 		}
-
 	}
 	pageData := &common.PageData{Pageinfo:pageinfo, Data:result}
+	logs.Debug("分页数据集->", pageData.Data, pageData.Pageinfo)
 	return pageData
 }
 func (baseDao *MongodbBaeDao)FindQueryForCount(c string, query interface{}) int {
