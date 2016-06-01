@@ -8,9 +8,7 @@ import (
 	"common"
 	"strings"
 	"sort"
-	"dao"
 	"gopkg.in/mgo.v2/bson"
-
 )
 
 type Item struct {
@@ -35,20 +33,23 @@ type Student struct {
 	Age int `bson:"age"`
 }
 func main() {
+
 	//parse8000()
 	//parsecet()
 	//fmt.Println(time.Now().Unix())
-	var baseDao = new (dao.MongodbBaeDao)
+	//var baseDao = new (dao.MongodbBaeDao)
 	//bo,err:=baseDao.Add("mytest",&Student{Id:bson.NewObjectId(),Name:"guoguo1",Age:1})
 	//bo,err:=baseDao.Update("mytest",bson.ObjectIdHex("5745350a943c8c1f80f2dfac"),bson.M{"age":7})
 	//bo,err:=baseDao.UpdateBySelector("mytest",bson.M{"tname":"guoguo1"},bson.M{"$set":bson.M{"age":2}})
 	//baseDao.GET("mytest","5745350a943c8c1f80f2dfac",stu)
 	//baseDao.FindAll("mytest",&stus)
 	//baseDao.Delete("mytest","57453251943c8c1cd819e2d5")
-	baseDao.Delete("mytest","574532d0943c8c1d345bf0af")
+	/*baseDao.Delete("mytest","574532d0943c8c1d345bf0af")
 	baseDao.Delete("mytest","574534ed943c8c1c88a0b546")
 	baseDao.Delete("mytest","5745350a943c8c1f80f2dfac")
-	baseDao.Delete("mytest","57453994943c8c1fd09cc920")
+	baseDao.Delete("mytest","57453994943c8c1fd09cc920")*/
+	//Bdate := "2014-06-24 14:30"//时间字符串
+	//fmt.Println(t)
 	//fmt.Println(bo,err)
 }
 func parse8000() {

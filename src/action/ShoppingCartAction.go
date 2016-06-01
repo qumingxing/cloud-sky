@@ -18,7 +18,7 @@ func (shoppingCartAction *ShoppingCartAction)AddCart(request *web.HttpRequest, r
 	userToken := request.FormValue("token")
 	cart := new(entity.ShoppingCart)
 	requestForm.GetRequestParameters(request, cart)
-	existsCart := shoppingCartSerevice.FindCartByCondition(bson.M{"userToken":userToken, "productId":cart.ProductId})
+	existsCart := shoppingCartSerevice.FindCartByCondition(bson.M{"userToken":userToken, "productId":cart.ProductId,"status":"0"})
 	var resultData map[string]interface{} = make(map[string]interface{})
 	resultData["success"] = false
 	if len(existsCart) > 0 {
@@ -28,9 +28,10 @@ func (shoppingCartAction *ShoppingCartAction)AddCart(request *web.HttpRequest, r
 		cart.PId = objectId
 		cart.Id = objectId.Hex()
 		cart.UserToken = userToken
+		cart.Status = "0"
 		flag := shoppingCartSerevice.AddCart(cart)
 		if flag {
-			shoppingcartItemNumb := shoppingCartSerevice.FindCartListCount(bson.M{"userToken":userToken})
+			shoppingcartItemNumb := shoppingCartSerevice.FindCartListCount(bson.M{"userToken":userToken,"status":"0"})
 			resultData["shoppingcartItemNumb"] = shoppingcartItemNumb
 			resultData["success"] = true
 		}
@@ -45,15 +46,10 @@ func (shoppingCartAction *ShoppingCartAction)FindShoppingCartList(request *web.H
 	pageInfo := new(common.PageInfo)
 	pageInfo.PageIndex = 1
 	pageInfo.PageSize = pageSize
-	shoppingCartPageData := shoppingCartSerevice.FindCartListPage(pageInfo, bson.M{"userToken":userToken})
-	dataMap := make(map[string]interface{}, 10)
-	dataMap["items"] = shoppingCartPageData.Data
-	dataMap["amount"] = shoppingCartSerevice.FindGroupBuyAmount(userToken)
-	dataMap["totalAmount"] = 123456
-	dataMap["freight"] = 1000
-
+	//status 0 表示未生产订单的
+	shoppingCartDataMap := shoppingCartSerevice.FindCartListPage(pageInfo, bson.M{"userToken":userToken, "status":"0"})
 	resultMap := make(map[string]interface{}, 10)
-	resultMap["data"] = dataMap
+	resultMap["data"] = shoppingCartDataMap
 	json, _ := common.ObjToJson(resultMap)
 	response.Write(json)
 	return nil

@@ -24,20 +24,47 @@ func (shoppingCartService *ShoppingCartService)AddCart(cart *entity.ShoppingCart
 	}
 	return false
 }
-func (shoppingCartService *ShoppingCartService)FindCartListPage(pageInfo *common.PageInfo, query bson.M) *common.PageData {
-	dataArr := make([]map[string]interface{}, 10)
-	pageData := baseDao.FindQueryForPage(cart_collection, query, &dataArr, pageInfo)
-	data := pageData.Data
-	if arrList, ok := data.(*[]map[string]interface{}); ok {
-		for _, value := range *arrList {
-			if a, b := value["productId"].(string); b {
-				product := productService.GetProduct(a)
-				value["image"] = product.Image
-				value["name"] = product.Name
+func (shoppingCartService *ShoppingCartService)UpdateCartStatus(selector bson.M, obj bson.M) bool {
+	flag, err := baseDao.UpdateBySelector(cart_collection, selector, obj)
+	if err == nil {
+		return flag
+	} else {
+		logs.Error("更新购物车失败->", err.Error())
+	}
+	return false
+}
+func (shoppingCartService *ShoppingCartService)FindCartListPage(pageInfo *common.PageInfo, query bson.M) map[string]interface{} {
+	dataMap := make([]map[string]interface{}, 10)
+	resultMap := make(map[string]interface{}, 10)
+	//pageData := baseDao.FindQueryForPage(cart_collection, query, &dataArr, pageInfo)
+	baseDao.FindQuery(cart_collection, query, &dataMap)
+	var totalAmount float64 = 0.0
+	//总单价
+	var amount float64 = 0.0
+	//总运费
+	var freight float64 = 0.0
+	for _, value := range dataMap {
+		if productId, ok := value["productId"].(string); ok {
+			product := productService.GetProduct(productId)
+			value["image"] = product.Image
+			value["name"] = product.Name
+			value["unitPrice"] = product.RetailPrice
+			if qty, ok1 := value["qty"].(int); ok1 {
+				amount += product.RetailPrice * float64(qty)
 			}
+			freight += product.Freight
 		}
 	}
-	return pageData
+	totalAmount = amount + freight
+	if len(dataMap) > pageInfo.PageSize {
+		resultMap["items"] = dataMap[pageInfo.PageIndex - 1:pageInfo.PageSize]//逻辑分页
+	} else {
+		resultMap["items"] = dataMap[pageInfo.PageIndex - 1:]//逻辑分页
+	}
+	resultMap["amount"] = amount//shoppingCartSerevice.FindGroupBuyAmount(userToken)
+	resultMap["totalAmount"] = totalAmount
+	resultMap["freight"] = freight
+	return resultMap
 }
 func (shoppingCartService *ShoppingCartService)FindGroupBuyAmount(userToken string) float64 {
 	amountMap := baseDao.FindGroup(cart_collection, bson.D{{"userToken", 1}}, bson.D{{"userToken", userToken}},

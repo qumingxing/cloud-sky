@@ -22,7 +22,7 @@ func (homeAction *HomePageAction)LoadHomePageData(request *web.HttpRequest, resp
 	advertPageData := advertService.LoadAdverts(pageInfo, bson.M{})
 	categoriesData := categoryService.LoadCategories(pageInfo, bson.M{})
 	userToken := request.FormValue("token")
-	existsCart := shoppingCartSerevice.FindCartByCondition(bson.M{"userToken":userToken})
+	existsCart := shoppingCartSerevice.FindCartByCondition(bson.M{"userToken":userToken,"status":"0"})
 	var resultData map[string]interface{} = make(map[string]interface{})
 	resultData["products"] = productPageData.Data
 	resultData["adverts"] = advertPageData.Data

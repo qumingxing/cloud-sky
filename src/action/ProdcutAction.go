@@ -16,6 +16,19 @@ type ProductAction struct {
 
 var productService service.ProductService
 
+func (productAction *ProductAction)FindProductList(request *web.HttpRequest, response *web.HttpResponse) web.IWebView {
+	pageSize := common.StringToInt(request.FormValue("pageSize"))
+	pageInfo := new(common.PageInfo)
+	pageInfo.PageIndex = 1
+	pageInfo.PageSize = pageSize
+	productPageData := productService.LoadProductByHomePage(pageInfo, bson.M{}, "-id")
+	var resultData map[string]interface{} = make(map[string]interface{})
+	resultData["data"] = productPageData.Data
+	json, _ := common.ObjToJson(resultData)
+	response.Write(json)
+	return nil
+}
+
 func (productAction *ProductAction)AddProduct(request *web.HttpRequest, response *web.HttpResponse) web.IWebView {
 	product := new(entity.Product)
 	requestForm.GetRequestParameters(request, product)
@@ -29,7 +42,7 @@ func (productAction *ProductAction)AddProduct(request *web.HttpRequest, response
 }
 func (productAction *ProductAction)GetProduct(request *web.HttpRequest, response *web.HttpResponse) web.IWebView {
 	userToken := request.FormValue("token")
-	existsCart := shoppingCartSerevice.FindCartByCondition(bson.M{"userToken":userToken})
+	existsCart := shoppingCartSerevice.FindCartByCondition(bson.M{"userToken":userToken, "status":"0"})
 	productId := request.FormValue("productId")
 	product := productService.GetProduct(productId)
 	var resultData map[string]interface{} = make(map[string]interface{})
